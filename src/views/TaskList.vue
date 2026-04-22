@@ -42,7 +42,46 @@
           >
             View
           </router-link>
+             <router-link 
+            :to="`/tasks/${task.id}/edit`" 
+            class="btn-sm btn-edit"
+          >
+            Edit
+          </router-link>
+
+          <button 
+            @click="deleteTask(task.id)" 
+            class="btn-sm btn-danger"
+          >
+            Delete
+          </button>
           </div>
+
+      </div>
+       <div 
+        class="pagination" 
+        v-if="pagination.last_page > 1"
+      >
+        <button 
+          :disabled="!pagination.prev_page_url" 
+          @click="fetchTasks(pagination.current_page - 1)" 
+          class="btn-page"
+        >
+          Prev
+        </button>
+
+        <span>
+          Page {{ pagination.current_page }} 
+          of {{ pagination.last_page }}
+        </span>
+
+        <button 
+          :disabled="!pagination.next_page_url" 
+          @click="fetchTasks(pagination.current_page + 1)" 
+          class="btn-page"
+        >
+          Next
+        </button>
       </div>
     </div>
   </div>
@@ -87,7 +126,26 @@ const filteredTasks = computed(() => {
     return matchesTitle && matchesStatus
   })
 })
+const updateStatus = async (task) => {
+  try {
+    await axios.put(`/api/tasks/${task.id}`, {
+      status: task.status
+    })
+  } catch (error) {
+    alert('Failed to update status')
+  }
+}
 
+const deleteTask = async (id) => {
+  if (confirm('Are you sure?')) {
+    try {
+      await axios.delete(`/api/tasks/${id}`)
+      fetchTasks(pagination.value.current_page || 1)
+    } catch (error) {
+      alert('Failed to delete task')
+    }
+  }
+}
 onMounted(() => fetchTasks())
 </script>
 
