@@ -1,5 +1,11 @@
 <template>
   <div>
+      <TaskFilters 
+      :searchQuery="searchQuery" 
+      :statusFilter="statusFilter" 
+      @update:searchQuery="searchQuery = $event" 
+      @update:statusFilter="statusFilter = $event"
+    />
      <div v-if="isLoading" class="state-msg">⏳ Loading tasks...</div>
     <div v-else-if="filteredTasks.length === 0" class="state-msg">
       🎉 No tasks found.
@@ -28,6 +34,15 @@
         <small class="task-meta">
           📅 Due: {{ task.due_date }}
         </small>
+
+          <div class="task-actions">
+          <router-link 
+            :to="`/tasks/${task.id}`" 
+            class="btn-sm btn-light"
+          >
+            View
+          </router-link>
+          </div>
       </div>
     </div>
   </div>
@@ -36,7 +51,8 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
-/* ================= STATE ================= */
+import TaskFilters from '../components/TaskFilters.vue'
+
 const tasks = ref([])
 const isLoading = ref(true)
 const searchQuery = ref('')
